@@ -10,7 +10,6 @@ type LastFiredMap = Record<string, number>
 
 export default function GalliExperience(){
   const videoRef = useRef<HTMLVideoElement | null>(null)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
   const [entered, setEntered] = useState(false)
   const [ambientPlaying, setAmbientPlaying] = useState(false)
   const [soundError, setSoundError] = useState<string | null>(null)
@@ -28,37 +27,25 @@ export default function GalliExperience(){
     }
   },[])
 
-  function tryPlayAudioAfterGesture(){
-    if(!audioRef.current){
-      audioRef.current = new Audio('/audio/ambient.mp3')
-      audioRef.current.loop = true
-      audioRef.current.volume = 0.3
-    }
-    audioRef.current.play().then(()=>{
-      setAmbientPlaying(true)
-      setSoundError(null)
-    }).catch((err)=>{
-      console.warn('Ambient play failed', err)
-      setAmbientPlaying(false)
-      setSoundError('⚠️ Tap to start ambient sound')
-    })
-  }
-
   function enterGalli(){
     setEntered(true)
-    // ensure video plays
-    const v = videoRef.current
-    if(v){
-      const p = v.play()
-      if(p && typeof p.then === 'function'){
-        p.catch(()=>{
-          // ignore autoplay prevention if any
-        })
-      }
-    }
+    
+    const video = videoRef.current
+    if(video){
+      video.muted = false
+      video.volume = 0.45
 
-    // start ambient sound via user gesture
-    tryPlayAudioAfterGesture()
+      video.play()
+        .then(() => {
+          setAmbientPlaying(true)
+          setSoundError(null)
+        })
+        .catch((error) => {
+          console.warn('Video audio playback failed', error)
+          setAmbientPlaying(false)
+          setSoundError('⚠️ Tap sound to retry')
+        })
+    }
 
     // start event engine
     scheduleNextEvent({initial:true})
@@ -193,12 +180,24 @@ export default function GalliExperience(){
   }
 
   function toggleSound(){
-    if(!audioRef.current) return
+    const video = videoRef.current
+    if(!video) return
+    
     if(ambientPlaying){
-      audioRef.current.pause()
+      video.muted = true
       setAmbientPlaying(false)
     }else{
-      audioRef.current.play().then(()=>setAmbientPlaying(true)).catch(()=>setSoundError('⚠️ Tap to start ambient sound'))
+      video.muted = false
+      video.volume = 0.45
+      video.play()
+        .then(()=>{
+          setAmbientPlaying(true)
+          setSoundError(null)
+        })
+        .catch((error)=>{
+          console.warn('Video audio playback failed', error)
+          setSoundError('⚠️ Tap sound to retry')
+        })
     }
   }
 
@@ -241,6 +240,12 @@ export default function GalliExperience(){
         <EventOverlay event={currentEvent} />
       )}
 
+      {entered && !currentEvent && (
+        <div className="alive-indicator">
+          <span className="alive-pulse">●</span> Galli is alive · next moment unfolding…
+        </div>
+      )}
+
       <div className="controls-tray">
         <div className="controls-grid">
           <Controls
@@ -253,10 +258,6 @@ export default function GalliExperience(){
           />
         </div>
       </div>
-
-      {/* hidden audio element for browsers that prefer <audio> tag */}
-      <audio ref={audioRef} src="/audio/ambient.mp3" loop style={{display:'none'}} />
-
     </div>
   )
 }
