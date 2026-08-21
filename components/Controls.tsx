@@ -22,7 +22,7 @@ export default function Controls({ onOrderChai, onHorn, onToggleSound, onWhatsHa
       </button>
 
       <button className="control-btn" onClick={onToggleSound} aria-pressed={soundOn} aria-label="Toggle sound">
-        <span className="control-emoji">{soundOn? '🔊':'🔈'}</span>
+        <span className="control-emoji">{soundOn ? '🔊' : '🔇'}</span>
         <span className="control-label">Sound</span>
       </button>
 
