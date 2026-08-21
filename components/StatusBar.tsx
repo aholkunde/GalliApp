@@ -8,7 +8,7 @@ export default function StatusBar({ ambientPlaying, soundError }: { ambientPlayi
         <div style={{color:'#ffcc00',display:'flex',gap:8,alignItems:'center'}}>{soundError}</div>
       ) : (
         <div style={{display:'flex',gap:8,alignItems:'center'}}>
-          <span>{ambientPlaying ? '🔊 Ambient playing' : '🔈 Ambient paused'}</span>
+          <span>{ambientPlaying ? '🔊 Sound on' : '🔇 Sound off'}</span>
         </div>
       )}
     </>
