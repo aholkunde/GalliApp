@@ -29,12 +29,12 @@ export default function GalliExperience(){
 
   function enterGalli(){
     setEntered(true)
-    
+  
     const video = videoRef.current
     if(video){
-      video.muted = false
       video.volume = 0.45
-
+      video.muted = false
+  
       video.play()
         .then(() => {
           setAmbientPlaying(true)
@@ -46,8 +46,7 @@ export default function GalliExperience(){
           setSoundError('⚠️ Tap sound to retry')
         })
     }
-
-    // start event engine
+  
     scheduleNextEvent({initial:true})
   }
 
@@ -220,7 +219,7 @@ export default function GalliExperience(){
         ref={videoRef}
         className="video-full"
         autoPlay
-        muted
+        muted={!entered}
         loop
         playsInline
         preload="auto"
