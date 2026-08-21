@@ -202,9 +202,11 @@ export default function GalliExperience(){
 
   return (
     <div className={`main-viewport ${powerCut ? 'power-cut' : ''}`}>
-      <div className="status-bar" role="status">
-        <StatusBar ambientPlaying={ambientPlaying} soundError={soundError} />
-      </div>
+      {entered && (
+        <div className="status-bar" role="status">
+          <StatusBar ambientPlaying={ambientPlaying} soundError={soundError} />
+        </div>
+      )}
 
       {!entered && (
         <div className="cinematic-overlay">
