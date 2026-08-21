@@ -226,7 +226,7 @@ export default function GalliExperience(){
         playsInline
         preload="auto"
       >
-        <source src="/videos/hyderabad-base.mp4" type="video/MP4" />
+        <source src="/videos/hyderabad-base.MP4" type="video/mp4" />
       </video>
 
       {rain && (
