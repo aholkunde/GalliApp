@@ -240,11 +240,11 @@ export default function GalliRadio({
           <div className="radio-mixer">
             <label>
               <span><span aria-hidden="true">🎵</span> Music <output>{musicVolume}%</output></span>
-              <input type="range" min="0" max="100" value={musicVolume} onChange={event => setMusicVolume(Number(event.target.value))} />
+              <input aria-label="Music volume" type="range" min="0" max="100" value={musicVolume} onChange={event => setMusicVolume(Number(event.target.value))} />
             </label>
             <label>
               <span><span aria-hidden="true">🌃</span> Street ambience <output>{Math.round(ambienceVolume * 100)}%</output></span>
-              <input type="range" min="0" max="100" value={Math.round(ambienceVolume * 100)} onChange={event => onAmbienceVolumeChange(Number(event.target.value) / 100)} />
+              <input aria-label="Street ambience volume" type="range" min="0" max="100" value={Math.round(ambienceVolume * 100)} onChange={event => onAmbienceVolumeChange(Number(event.target.value) / 100)} />
             </label>
           </div>
 
