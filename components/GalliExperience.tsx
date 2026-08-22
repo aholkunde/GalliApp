@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import eventsData, { GalliEvent } from '../data/events'
 import EventOverlay from './EventOverlay'
 import Controls from './Controls'
+import GalliRadio from './GalliRadio'
 import StatusBar from './StatusBar'
 
 type LastFiredMap = Record<string, number>
@@ -28,6 +29,8 @@ export default function GalliExperience() {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const [entered, setEntered] = useState(false)
   const [soundOn, setSoundOn] = useState(false)
+  const [ambienceVolume, setAmbienceVolume] = useState(0.45)
+  const [radioOpen, setRadioOpen] = useState(false)
   const [soundError, setSoundError] = useState<string | null>(null)
   const [currentEvent, setCurrentEvent] = useState<GalliEvent | null>(null)
   const [chaiCount, setChaiCount] = useState(0)
@@ -169,8 +172,8 @@ export default function GalliExperience() {
     setSoundError(null)
 
     if (video) {
-      video.volume = 0.45
-      video.muted = false
+      video.volume = ambienceVolume
+      video.muted = ambienceVolume === 0
       void video.play().catch(error => {
         console.warn('Video audio playback failed', error)
         setSoundOn(false)
@@ -226,11 +229,13 @@ export default function GalliExperience() {
     if (soundOn) {
       video.muted = true
       setSoundOn(false)
+      setAmbienceVolume(0)
       return
     }
 
     video.volume = 0.45
     video.muted = false
+    setAmbienceVolume(0.45)
     setSoundOn(true)
     void video.play()
       .then(() => setSoundError(null))
@@ -239,6 +244,27 @@ export default function GalliExperience() {
         setSoundOn(false)
         setSoundError('⚠️ Tap sound to retry')
       })
+  }
+
+  function handleAmbienceVolumeChange(volume: number) {
+    const nextVolume = Math.min(1, Math.max(0, volume))
+    const video = videoRef.current
+    setAmbienceVolume(nextVolume)
+    setSoundOn(nextVolume > 0)
+
+    if (!video) return
+    video.volume = nextVolume
+    video.muted = nextVolume === 0
+
+    if (nextVolume > 0) {
+      void video.play()
+        .then(() => setSoundError(null))
+        .catch(error => {
+          console.warn('Video audio playback failed', error)
+          setSoundOn(false)
+          setSoundError('⚠️ Tap sound to retry')
+        })
+    }
   }
 
   function handleWhatsHappening() {
@@ -282,6 +308,24 @@ export default function GalliExperience() {
 
           {vehicleActive ? <div className="vehicle slide">🛺 Passing auto</div> : null}
           {hornActive ? <div className="event-overlay horn-overlay" role="status">POOOONK 📣</div> : null}
+
+          <button
+            className="radio-toggle"
+            onClick={() => setRadioOpen(open => !open)}
+            aria-expanded={radioOpen}
+            aria-controls="galli-radio-panel"
+          >
+            🎵 Galli Radio
+          </button>
+
+          <div id="galli-radio-panel">
+            <GalliRadio
+              open={radioOpen}
+              onClose={() => setRadioOpen(false)}
+              ambienceVolume={ambienceVolume}
+              onAmbienceVolumeChange={handleAmbienceVolumeChange}
+            />
+          </div>
 
           <div className="controls-tray">
             <div className="controls-grid">
